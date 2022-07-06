@@ -24,22 +24,35 @@ async function main() {
     });
 
     app.get("/teams", async function (req, res) {
-        let teamName = req.body.teamName;
-        let numberOfFiveStar = req.body.numberOfFiveStars;
-        let includedCharacters = req.body.includedCharacters;
-        let recommendedBosses = req.body.recommendedBosses;
+        let teamName = req.query.teamName;
+        let numberOfFiveStar = req.query.numberOfFiveStars;
+        let includedCharacters = req.query.includedCharacters; // Array of ObjectId Eg.["62c3be3de120685cac3ab51b", ...]
+        let bosses = req.query.bosses; // Array of ObjectId ["62c3d18ee120685cac423196", ...]
 
         let criteria = {};
+        if (teamName) { criteria.team_name = teamName };
+        if (numberOfFiveStar) { criteria.number_of_five_star = numberOfFiveStar };
+        if (includedCharacters) {
+            let includedCharactersCriteria = includedCharacters.map(c => {
+                return { team_composition: { $elemMatch: { character: ObjectId(c) } } };
+            });
+            criteria = {
+                ...criteria,
+                $and: includedCharactersCriteria
+            };
+        };
+        if (bosses) { criteria.bosses = { $all: bosses.map(b => ObjectId(b)) } };
+
         let teams = await db.collection("teams").find(criteria).toArray();
         res.json({ teams });
     });
 
     app.post("/teams", async function (req, res) {
-        let team_name = req.body.team_name;
-        let team_composition = req.body.team_composition;
-        let bosses = req.body.bosses;
-        let rotation_guide = req.body.rotation_guide;
-        let notes= req.body.notes;
+        let team_name = req.query.team_name;
+        let team_composition = req.query.team_composition;
+        let bosses = req.query.bosses;
+        let rotation_guide = req.query.rotation_guide;
+        let notes = req.query.notes;
         await db.collection("teams").insertOne({
             team_name,
             team_composition,
