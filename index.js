@@ -14,20 +14,38 @@ async function main() {
     await MongoUtil.connect(MONGO_URI, "project_2");
     const db = MongoUtil.getDB();
 
-    const allCharacters = await db.collection("characters").find({}).toArray();
-    const allWeapons = await db.collection("weapons").find({}).toArray();
-    const allArtifacts = await db.collection("artifacts").find({}).toArray();
-    const allBosses = await db.collection("bosses").find({}).toArray();
-
     app.get("/", function (req, res) {
         res.send("Hello World");
     });
 
+    app.get("/characters", async function (req, res) {
+        let characters = await db.collection("characters").find({}).toArray();
+        res.json(characters)
+    });
+    app.get("/weapons", async function (req, res) {
+        let weapons = await db.collection("weapons").find({}).toArray();
+        res.json(weapons)
+    });
+    app.get("/artifacts", async function (req, res) {
+        let artifacts = await db.collection("artifacts").find({}).toArray();
+        res.json(artifacts)
+    });
+    app.get("/bosses", async function (req, res) {
+        let bosses = await db.collection("bosses").find({}).toArray();
+        res.json(bosses)
+    });
+
+    app.post("/teams", async function (req, res) {
+        let newTeam = req.body.newTeam
+        await db.collection("teams").insertOne({
+            _id: new ObjectId(),
+            ...newTeam
+        });
+        res.sendStatus(200);
+    });
+
     app.get("/teams", async function (req, res) {
-        let teamName = req.query.teamName;
-        let numberOfFiveStar = req.query.numberOfFiveStars;
-        let includedCharacters = req.query.includedCharacters; // Array of ObjectId Eg.["62c3be3de120685cac3ab51b", ...]
-        let bosses = req.query.bosses; // Array of ObjectId ["62c3d18ee120685cac423196", ...]
+        let { teamName, numberOfFiveStar, includedCharacters, targetedBoss } = req.query;
 
         let criteria = {};
         if (teamName) { criteria.team_name = teamName };
@@ -41,26 +59,31 @@ async function main() {
                 $and: includedCharactersCriteria
             };
         };
-        if (bosses) { criteria.bosses = { $all: bosses.map(b => ObjectId(b)) } };
+        if (targetedBoss) { criteria.bosses = { $in: targetedBoss.map(b => ObjectId(b)) } };
 
         let teams = await db.collection("teams").find(criteria).toArray();
         res.json({ teams });
     });
 
-    app.post("/teams", async function (req, res) {
-        let team_name = req.query.team_name;
-        let team_composition = req.query.team_composition;
-        let bosses = req.query.bosses;
-        let rotation_guide = req.query.rotation_guide;
-        let notes = req.query.notes;
-        await db.collection("teams").insertOne({
-            team_name,
-            team_composition,
-            bosses,
-            rotation_guide,
-            notes
+    app.put("/teams/:_id", async function (req, res) {
+        let { _id } = req.params;
+        console.log(req.body);
+        await db.collection("teams").replaceOne({
+            _id: ObjectId(_id)
+        }, req.body);
+        res.sendStatus(200);
+    });
+
+    app.delete("/teams/:_id", async function (req, res) {
+        let { _id } = req.params;
+        await db.collection("teams").deleteOne({
+            _id: ObjectId(_id)
         });
         res.sendStatus(200);
+    });
+
+    app.post("/test", function (req, res) {
+        res.send(req.body)
     });
 }
 main();
