@@ -16,19 +16,19 @@ async function main() {
 
     app.get("/characters", async function (req, res) {
         let characters = await db.collection("characters").find({}).toArray();
-        res.json(characters)
+        res.json(characters);
     });
     app.get("/weapons", async function (req, res) {
         let weapons = await db.collection("weapons").find({}).toArray();
-        res.json(weapons)
+        res.json(weapons);
     });
     app.get("/artifacts", async function (req, res) {
         let artifacts = await db.collection("artifacts").find({}).toArray();
-        res.json(artifacts)
+        res.json(artifacts);
     });
     app.get("/bosses", async function (req, res) {
         let bosses = await db.collection("bosses").find({}).toArray();
-        res.json(bosses)
+        res.json(bosses);
     });
 
     app.post("/teams", async function (req, res) {
