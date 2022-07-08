@@ -14,10 +14,6 @@ async function main() {
     await MongoUtil.connect(MONGO_URI, "project_2");
     const db = MongoUtil.getDB();
 
-    app.get("/", function (req, res) {
-        res.send("Hello World");
-    });
-
     app.get("/characters", async function (req, res) {
         let characters = await db.collection("characters").find({}).toArray();
         res.json(characters)
@@ -81,11 +77,7 @@ async function main() {
         });
         res.sendStatus(200);
     });
-
-    app.post("/test", function (req, res) {
-        res.send(req.body)
-    });
 }
 main();
 
-app.listen(3000, function () { console.log("server started"); });
+app.listen(process.env.PORT, function () { console.log("server started"); });
