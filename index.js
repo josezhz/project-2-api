@@ -45,7 +45,7 @@ async function main() {
 
         let criteria = {};
         if (teamName) { criteria.team_name = { $regex: teamName, $options: "i" } };
-        if (numberOfFiveStar) { criteria.number_of_five_star = numberOfFiveStar };
+        if (numberOfFiveStar) { criteria.number_of_five_star = { $eq: parseInt(numberOfFiveStar) } };
         if (includedCharacters) {
             let includedCharactersCriteria = includedCharacters.map(c => {
                 return { team_composition: { $elemMatch: { character: ObjectId(c) } } };
