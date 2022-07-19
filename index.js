@@ -41,10 +41,10 @@ async function main() {
     });
 
     app.get("/teams", async function (req, res) {
-        let { teamName, numberOfFiveStar, includedCharacters, targetedBoss } = req.query;
+        let { teamName, numberOfFiveStar, includedCharacters, targetBoss } = req.query;
 
         let criteria = {};
-        if (teamName) { criteria.team_name = teamName };
+        if (teamName) { criteria.team_name = { $regex: teamName, $options: "i" } };
         if (numberOfFiveStar) { criteria.number_of_five_star = numberOfFiveStar };
         if (includedCharacters) {
             let includedCharactersCriteria = includedCharacters.map(c => {
@@ -55,7 +55,7 @@ async function main() {
                 $and: includedCharactersCriteria
             };
         };
-        if (targetedBoss) { criteria.bosses = { $in: targetedBoss.map(b => ObjectId(b)) } };
+        if (targetBoss) { criteria.bosses = { $in: targetBoss.map(b => ObjectId(b)) } };
 
         let teams = await db.collection("teams").find(criteria).toArray();
         res.json({ teams });
