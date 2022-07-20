@@ -55,7 +55,7 @@ async function main() {
                 $and: includedCharactersCriteria
             };
         };
-        if (targetBoss) { criteria.bosses = { $in: targetBoss.map(b => { return { $oid: b } }) } };
+        if (targetBoss) { criteria.bosses = { $all: [{ $oid: targetBoss }] } };
 
         let teams = await db.collection("teams").find(criteria).toArray();
         res.json({ teams });
@@ -80,4 +80,5 @@ async function main() {
 }
 main();
 
-app.listen(process.env.PORT, function () { console.log("server started"); });
+// app.listen(process.env.PORT, function () { console.log("server started"); });
+app.listen(3000, function () { console.log("server started"); });
