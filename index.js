@@ -80,5 +80,5 @@ async function main() {
 }
 main();
 
-// app.listen(process.env.PORT, function () { console.log("server started"); });
-app.listen(3000, function () { console.log("server started"); });
+app.listen(process.env.PORT, function () { console.log("server started"); });
+// app.listen(3000, function () { console.log("server started"); });
