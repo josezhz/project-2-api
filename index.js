@@ -48,7 +48,7 @@ async function main() {
         if (numberOfFiveStar) { criteria.number_of_five_star = { $eq: parseInt(numberOfFiveStar) } };
         if (includedCharacters) {
             let includedCharactersCriteria = includedCharacters.map(c => {
-                return { team_composition: { $elemMatch: { character: { $oid: c } } } };
+                return { team_composition: { $elemMatch: { "character.$oid": c } } };
             });
             criteria = {
                 ...criteria,
@@ -81,4 +81,3 @@ async function main() {
 main();
 
 app.listen(process.env.PORT, function () { console.log("server started"); });
-// app.listen(3000, function () { console.log("server started"); });
