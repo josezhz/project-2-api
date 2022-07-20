@@ -48,14 +48,14 @@ async function main() {
         if (numberOfFiveStar) { criteria.number_of_five_star = { $eq: parseInt(numberOfFiveStar) } };
         if (includedCharacters) {
             let includedCharactersCriteria = includedCharacters.map(c => {
-                return { team_composition: { $elemMatch: { character: ObjectId(c) } } };
+                return { team_composition: { $elemMatch: { character: { $oid: c } } } };
             });
             criteria = {
                 ...criteria,
                 $and: includedCharactersCriteria
             };
         };
-        if (targetBoss) { criteria.bosses = { $in: targetBoss.map(b => ObjectId(b)) } };
+        if (targetBoss) { criteria.bosses = { $in: targetBoss.map(b => { return { $oid: b } }) } };
 
         let teams = await db.collection("teams").find(criteria).toArray();
         res.json({ teams });
