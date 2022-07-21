@@ -32,10 +32,9 @@ async function main() {
     });
 
     app.post("/teams", async function (req, res) {
-        let newTeam = req.body.newTeam
         await db.collection("teams").insertOne({
             _id: new ObjectId(),
-            ...newTeam
+            ...req.body.newTeam
         });
         res.sendStatus(200);
     });
@@ -63,10 +62,9 @@ async function main() {
 
     app.put("/teams/:_id", async function (req, res) {
         let { _id } = req.params;
-        console.log(req.body);
         await db.collection("teams").replaceOne({
             _id: ObjectId(_id)
-        }, req.body);
+        }, req.body.modifiedTeam);
         res.sendStatus(200);
     });
 
